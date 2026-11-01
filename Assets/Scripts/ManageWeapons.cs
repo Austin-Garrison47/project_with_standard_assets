@@ -8,6 +8,8 @@ public class ManageWeapons : MonoBehaviour
     public Camera playerCamera;
     public TMP_Text ammoText;
     public TMP_Text targetScoreText;
+    public TMP_Text maxAmmoText;
+
     public int gunAmmo = 10;
     public int maxAmmo = 10;
     public int targetScore = 0;
@@ -15,11 +17,18 @@ public class ManageWeapons : MonoBehaviour
     public float reloadTime = 2f;
 
     private bool isReloading = false;
+    private int originalMaxAmmo;
+    private float originalReloadTime;
 
     void Start()
     {
+        originalMaxAmmo = maxAmmo;
+        originalReloadTime = reloadTime;
+
         UpdateAmmo();
-        targetScoreText.text = "Score: " + targetScore;
+
+        if (targetScoreText != null)
+            targetScoreText.text = "Score: " + targetScore;
     }
 
     void Update()
@@ -40,6 +49,9 @@ public class ManageWeapons : MonoBehaviour
 
     void Shoot()
     {
+        if (playerCamera == null)
+            return;
+
         gunAmmo--;
         UpdateAmmo();
 
@@ -50,13 +62,16 @@ public class ManageWeapons : MonoBehaviour
         {
             Debug.Log("Hit: " + hit.collider.name);
 
-            ShootingTarget target = hit.collider.GetComponent<ShootingTarget>();
+            ShootingTarget target =
+                hit.collider.GetComponent<ShootingTarget>();
 
             if (target != null)
             {
                 target.Hit();
                 targetScore++;
-                targetScoreText.text = "Score: " + targetScore;
+
+                if (targetScoreText != null)
+                    targetScoreText.text = "Score: " + targetScore;
             }
         }
     }
@@ -82,8 +97,35 @@ public class ManageWeapons : MonoBehaviour
         }
     }
 
+    public void ChangeMaxAmmo(int index)
+    {
+        if (index == 0)
+            maxAmmo = originalMaxAmmo * 2;
+        else if (index == 1)
+            maxAmmo = originalMaxAmmo * 5;
+        else if (index == 2)
+            maxAmmo = originalMaxAmmo * 10;
+
+        gunAmmo = maxAmmo;
+        UpdateAmmo();
+    }
+
+    public void ChangeReloadTime(int index)
+    {
+        if (index == 0)
+            reloadTime = originalReloadTime * 0.5f;
+        else if (index == 1)
+            reloadTime = originalReloadTime;
+        else if (index == 2)
+            reloadTime = originalReloadTime * 2f;
+    }
+
     void UpdateAmmo()
     {
-        ammoText.text = "Ammo: " + gunAmmo + "/" + maxAmmo;
+        if (ammoText != null)
+            ammoText.text = "Ammo: " + gunAmmo + "/" + maxAmmo;
+
+        if (maxAmmoText != null)
+            maxAmmoText.text = "Max Ammo: " + maxAmmo;
     }
 }

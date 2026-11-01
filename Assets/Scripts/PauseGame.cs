@@ -16,6 +16,19 @@ public class PauseGame : MonoBehaviour
 
     void Update()
     {
+        if (fpsController == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+            if (player != null)
+            {
+                fpsController = player.GetComponent<FirstPersonController>();
+
+                if (fpsController != null && Time.timeScale == 0f)
+                    fpsController.enabled = false;
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             TogglePause();
@@ -34,21 +47,23 @@ public class PauseGame : MonoBehaviour
     public void TogglePause()
     {
         if (Time.timeScale == 0f)
-        {
             Resume();
-        }
         else
-        {
             Pause();
-        }
     }
 
     void Pause()
     {
         Time.timeScale = 0f;
-        buttonText.text = "Resume";
-        preferences.SetActive(true);
-        fpsController.enabled = false;
+
+        if (buttonText != null)
+            buttonText.text = "Resume";
+
+        if (preferences != null)
+            preferences.SetActive(true);
+
+        if (fpsController != null)
+            fpsController.enabled = false;
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -57,9 +72,15 @@ public class PauseGame : MonoBehaviour
     void Resume()
     {
         Time.timeScale = 1f;
-        buttonText.text = "Pause";
-        preferences.SetActive(false);
-        fpsController.enabled = true;
+
+        if (buttonText != null)
+            buttonText.text = "Pause";
+
+        if (preferences != null)
+            preferences.SetActive(false);
+
+        if (fpsController != null)
+            fpsController.enabled = true;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
